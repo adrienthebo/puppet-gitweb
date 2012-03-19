@@ -56,13 +56,11 @@ $ENV{GL_REPO_BASE_ABS} = $projectroot;
 
 $export_auth_hook = sub {
     my $repo = shift;
-    print "projects_list: $projects_list\n";
     # gitweb passes us the full repo path; so we strip the beginning
     # and the end, to get the repo name as it is specified in gitolite conf
     return unless $repo =~ s!^\Q<%= project_root %>\E\/?(.+)\.git$!$1!;
 
     # check for (at least) "R" permission
     my ($perm, $creator) = &repo_rights($repo);
-    print STDERR "user: $ENV{GL_USER} repo: $repo perms: $perm creator: $creator thing \n";
     return ($perm =~ /R/);
 };
