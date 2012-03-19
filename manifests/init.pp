@@ -20,15 +20,20 @@ class gitweb($site_alias, $doc_root, $project_root, $projects_list, $ssl = true)
   }
 
   file { $doc_root:
-    ensure => directory,
-    owner  => 'git', # XXX,
-    group  => 'git', # XXX,
-    source => 'puppet:///modules/gitweb/html',
+    ensure  => directory,
+    owner   => 'git', # XXX,
+    group   => 'git', # XXX,
+    source  => 'puppet:///modules/gitweb/html',
+    recurse => true,
   }
 
-  apache::vhost::redirect { $site_alias:
-    port  => "80",
-    dest  => "https://${site_alias}",
+  # Ensure that cgi script is executable
+  file { "${doc_root}/index.cgi":
+    ensure  => file,
+    owner   => 'git', # XXX,
+    group   => 'git', # XXX,
+    mode    => '0755',
+    source  => 'puppet:///modules/gitweb/html/index.cgi',
   }
 
   apache::vhost { "${site_alias}_ssl":
