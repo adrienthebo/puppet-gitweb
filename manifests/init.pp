@@ -9,11 +9,7 @@
 #   - gitweb::settings
 # Sample Usage:
 #   include gitweb
-class gitweb($site_alias, $doc_root, $project_root, $projects_list) {
-
-  package { "gitweb":
-    ensure  => present,
-  }
+class gitweb($site_alias, $doc_root, $project_root, $projects_list, $ssl = true) {
 
   file { "/etc/gitweb.conf":
     ensure  => present,
@@ -21,7 +17,6 @@ class gitweb($site_alias, $doc_root, $project_root, $projects_list) {
     group   => "root",
     mode    => "0644",
     content => template("gitweb/gitweb.conf.erb"),
-    require => Package["gitweb"],
   }
 
   file { $doc_root:
