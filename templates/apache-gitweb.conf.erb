@@ -3,9 +3,6 @@ NameVirtualHost  *:<%= port %>
     ServerName <%= name %>
     DocumentRoot <%= docroot %>
 
-    RewriteEngine On
-    RewriteRule ^/$ /gitweb [R]
-
 <% if ssl == true -%>
     SSLEngine on
     SSLCertificateFile /etc/ssl/certs/gitweb.cert
