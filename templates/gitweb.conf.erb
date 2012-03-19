@@ -11,13 +11,58 @@ $git_temp = "/tmp";
 $home_text = "indextext.html";
 
 # file with project list; by default, simply scan the projectroot dir.
-$projects_list = "<%= projects_list %>";
+$projects_list = $projectroot;
 
 # stylesheet to use
-$stylesheet = "/gitweb/gitweb.css";
+$stylesheet = "/gitweb.css";
 
 # logo to use
-$logo = "/gitweb/git-logo.png";
+$logo = "/git-logo.png";
 
 # the 'favicon'
-$favicon = "/gitweb/git-favicon.png";
+$favicon = "/git-favicon.png";
+
+# --------------------------------------------
+# Per-repo authorization based on gitolite ACL
+# Include this in gitweb.conf
+# See doc/3-faq-tips-etc.mkd for more info
+
+# HOME of the gitolite user
+my $gl_home = $ENV{HOME} = "/home/git";
+
+# the following variables are needed by gitolite; please edit before using
+
+# this should normally not be anything else
+$ENV{GL_RC} = "$gl_home/.gitolite.rc";
+# this can have different values depending on how you installed.
+
+$ENV{GL_BINDIR} = "/usr/share/gitolite";
+# If in doubt take a look at ~/.ssh/authorized_keys; at least one of the lines
+# might contain something like:
+#       command="/home/git/.gitolite/src/gl-auth-command
+# and you should use whatever directory the gl-auth-command is in (in this
+# example /home/git/.gitolite.src)
+
+# finally the user name
+$ENV{GL_USER} = $cgi->remote_user || "gitweb";
+
+# now get gitolite stuff in...
+unshift @INC, $ENV{GL_BINDIR};
+#require gitolite_rc;    gitolite_rc -> import;
+require gitolite;       gitolite    -> import;
+
+# set project root etc. absolute paths
+$ENV{GL_REPO_BASE_ABS} = $projectroot;
+
+$export_auth_hook = sub {
+    my $repo = shift;
+    print "projects_list: $projects_list\n";
+    # gitweb passes us the full repo path; so we strip the beginning
+    # and the end, to get the repo name as it is specified in gitolite conf
+    return unless $repo =~ s!^\Q<%= project_root %>\E\/?(.+)\.git$!$1!;
+
+    # check for (at least) "R" permission
+    my ($perm, $creator) = &repo_rights($repo);
+    print STDERR "user: $ENV{GL_USER} repo: $repo perms: $perm creator: $creator thing \n";
+    return ($perm =~ /R/);
+};
