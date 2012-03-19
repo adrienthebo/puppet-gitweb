@@ -1,5 +1,5 @@
 # Class: gitweb
-#   Installs gitweb and configures apache to server it.
+#   Installs gitweb and configures apache to serve it.
 # Parameters:
 #
 # Actions:
@@ -36,10 +36,24 @@ class gitweb($site_alias, $doc_root, $project_root, $projects_list, $ssl = true)
     source  => 'puppet:///modules/gitweb/html/index.cgi',
   }
 
-  apache::vhost { "${site_alias}_ssl":
+  if $ssl == true {
+    # Listen on port 443 and enable SSL redirection
+
+    apache::vhost::redirect { $site_alias:
+      port  => "80",
+      dest  => "https://${site_alias}",
+    }
+
+    $apache_port = '443'
+  }
+  else {
+    $apache_port = '80'
+  }
+
+  apache::vhost { $site_alias:
     priority      => "10",
-    port          => "443",
-    ssl           => true,
+    port          => $apache_port,
+    ssl           => $ssl,
     docroot       => $doc_root,
     template      => "gitweb/apache-gitweb.conf.erb",
   }
