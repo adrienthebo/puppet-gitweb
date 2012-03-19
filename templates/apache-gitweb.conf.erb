@@ -20,8 +20,8 @@ NameVirtualHost  *:<%= port %>
         AddHandler cgi-script cgi
         DirectoryIndex gitweb.cgi
         AuthType Basic
-        AuthName "Protected"
-        AuthUserFile /usr/local/apache/passwd/passwords
+        AuthName "Gitweb"
+        AuthUserFile /home/git/.htpasswd
         Require valid-user
     </Directory>
 
