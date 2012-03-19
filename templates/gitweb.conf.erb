@@ -1,5 +1,5 @@
 # path to git projects (<project>.git)
-$projectroot = "<%= scope.lookupvar('gitweb::settings::projectroot') %>";
+$projectroot = "<%= project_root %>";
 
 # directory to use for temp files
 $git_temp = "/tmp";
@@ -11,7 +11,7 @@ $git_temp = "/tmp";
 $home_text = "indextext.html";
 
 # file with project list; by default, simply scan the projectroot dir.
-$projects_list = $projectroot;
+$projects_list = "<%= projects_list %>";
 
 # stylesheet to use
 $stylesheet = "/gitweb/gitweb.css";

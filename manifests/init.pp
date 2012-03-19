@@ -9,9 +9,7 @@
 #   - gitweb::settings
 # Sample Usage:
 #   include gitweb
-class gitweb {
-
-  include gitweb::settings
+class gitweb($site_alias, $doc_root, $project_root, $projects_list) {
 
   package { "gitweb":
     ensure  => present,
@@ -26,18 +24,23 @@ class gitweb {
     require => Package["gitweb"],
   }
 
-  A2mod <| title == "rewrite" |>
-
-  apache::vhost::redirect { "${gitweb::settings::site_alias}":
-    port  => "80",
-    dest  => "https://${gitweb::settings::site_alias}",
+  file { $doc_root:
+    ensure => directory,
+    owner  => 'git', # XXX,
+    group  => 'git', # XXX,
+    source => 'puppet:///modules/gitweb/html',
   }
 
-  apache::vhost { "${gitweb::settings::site_alias}_ssl":
+  apache::vhost::redirect { $site_alias:
+    port  => "80",
+    dest  => "https://${site_alias}",
+  }
+
+  apache::vhost { "${site_alias}_ssl":
     priority      => "10",
     port          => "443",
     ssl           => true,
-    docroot       => "/var/www/git",
+    docroot       => $doc_root,
     template      => "gitweb/apache-gitweb.conf.erb",
   }
 }
