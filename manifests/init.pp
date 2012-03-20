@@ -50,11 +50,17 @@ class gitweb($site_alias, $doc_root, $project_root, $projects_list, $ssl = true)
     $apache_port = '80'
   }
 
+  include apache::mod::suexec
+  include apache::mod::rewrite
   apache::vhost { $site_alias:
-    priority      => "10",
-    port          => $apache_port,
-    ssl           => $ssl,
-    docroot       => $doc_root,
-    template      => "gitweb/apache-gitweb.conf.erb",
+    priority => "10",
+    port     => $apache_port,
+    ssl      => $ssl,
+    docroot  => $doc_root,
+    template => "gitweb/apache-gitweb.conf.erb",
+    require  => [
+      Class['apache::mod::rewrite'],
+      Class['apache::mod::suexec'],
+    ],
   }
 }

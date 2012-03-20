@@ -2,6 +2,10 @@ NameVirtualHost  *:<%= port %>
 <VirtualHost *:<%= port %>>
     ServerName <%= name %>
     DocumentRoot <%= docroot %>
+    SuexecUserGroup git git
+
+    RewriteEngine on
+    RewriteRule ^/$  /index.cgi [L]
 
 <% if ssl == true -%>
     SSLEngine on
